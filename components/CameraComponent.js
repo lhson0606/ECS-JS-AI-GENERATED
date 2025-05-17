@@ -4,7 +4,8 @@
  */
 
 // Camera component to handle view transformations
-var CameraComponent = gv.Component.extend({    ctor: function(entityId) {
+ECS.CameraComponent = ECS.Component.extend({    
+    ctor: function(entityId) {
         this._super(entityId);
         this.viewMatrix = new glm.mat4(1); // Identity matrix
         this.projectionMatrix = new glm.mat4(1); // Identity matrix for 2D
@@ -18,22 +19,25 @@ var CameraComponent = gv.Component.extend({    ctor: function(entityId) {
         this.far = 1000.0;
         this.active = true;
         this._needsUpdate = true;
-        this.applyRotation = false; // Whether to apply camera rotation to sprites
+        this.applyRotation = true; // Whether to apply camera rotation to sprites
         
         // Follow properties
         this._followTarget = null;
         this._smoothFollow = false;
         this._smoothSpeed = 5;
     },
+
+    _name: function() {
+        return "CameraComponent";
+    },
     
     awake: function() {
-        Log.debug("CameraComponent: Awake");
+        // Log.debug("CameraComponent: Awake");
         
         // Get the transform component
-        this.transform = this.getComponent(TransformComponent);
+        this.transform = this.getComponent("TransformComponent");
         if (!this.transform) {
-            Log.error("CameraComponent requires a TransformComponent");
-            return;
+            throw new Error("CameraComponent requires a TransformComponent");
         }
         
         // Initialize matrices
@@ -46,11 +50,15 @@ var CameraComponent = gv.Component.extend({    ctor: function(entityId) {
     },
     
     start: function() {
-        Log.debug("CameraComponent: Start");
+        // Log.debug("CameraComponent: Start");
     },
-      update: function(dt) {
+
+    update: function(dt) {
         if (!this.transform) return;
-        
+
+        // this.moveTo(this.transform.position.x + dt * 5, this.transform.position.y + dt*5, this.transform.position.z);
+        // this.setZoom(this.zoom - dt * 0.1);
+
         // Handle follow functionality
         if (this._followTarget) {
             var targetPos = this._followTarget.getWorldPosition();
@@ -91,7 +99,7 @@ var CameraComponent = gv.Component.extend({    ctor: function(entityId) {
         
         // Calculate view matrix (inverse of transform's world matrix)
         var position = this.transform.getWorldPosition();
-        var lookAt = glm.vec3.add(position, new glm.vec3(0, 0, -1)); // Look along negative Z
+        var lookAt = glm.add(position, new glm.vec3(0, 0, -1)); // Look along negative Z
         var up = new glm.vec3(0, 1, 0); // Y is up
         
         this.viewMatrix = glm.lookAt(position, lookAt, up);
@@ -107,7 +115,7 @@ var CameraComponent = gv.Component.extend({    ctor: function(entityId) {
         );
         
         // Combine view and projection
-        this.combined = glm.multiply(this.projectionMatrix, this.viewMatrix);
+        this.combined = glm.mul(this.projectionMatrix, this.viewMatrix);
         
         this._needsUpdate = false;
     },
@@ -149,7 +157,7 @@ var CameraComponent = gv.Component.extend({    ctor: function(entityId) {
         var worldVec4 = new glm.vec4(worldPos.x, worldPos.y, worldPos.z, 1.0);
         
         // Apply camera transformation
-        var clipSpace = glm.multiply(this.combined, worldVec4);
+        var clipSpace = glm.mul(this.combined, worldVec4);
         
         // Perspective division (for completeness, although in 2D w should remain 1)
         var ndcSpace = new glm.vec3(
@@ -209,7 +217,8 @@ var CameraComponent = gv.Component.extend({    ctor: function(entityId) {
      * Check if a world position is visible in the camera view
      * @param {glm.vec3} worldPos - Position in world space
      * @returns {boolean} True if the position is visible
-     */    isVisible: function(worldPos) {
+     */    
+    isVisible: function(worldPos) {
         var screenPos = this.worldToScreenPoint(worldPos);
         return (
             screenPos.x >= 0 && screenPos.x <= this.viewportSize.x &&
@@ -232,6 +241,13 @@ var CameraComponent = gv.Component.extend({    ctor: function(entityId) {
             z = z || 0;
             this.transform.setPosition(x, y, z);
         }
+
+        // Mark the transform as dirty
+        this.transform._isDirty = true;
+        this._needsUpdate = true;
+
+        // Update matrices after moving
+        this.updateMatrices();
     },
     
     /**
@@ -249,6 +265,13 @@ var CameraComponent = gv.Component.extend({    ctor: function(entityId) {
             z = z || 0;
             this.transform.translate(x, y, z);
         }
+
+        // Mark the transform as dirty
+        this.transform._isDirty = true;
+        this._needsUpdate = true;
+
+        // Update matrices after moving
+        this.updateMatrices();
     },
     
     /**
@@ -423,12 +446,28 @@ var CameraComponent = gv.Component.extend({    ctor: function(entityId) {
         if (!gv.entityManager) return null;
         return gv.entityManager.getComponent(entityId, componentType);
     },
+
+    setPosition: function(x, y, z) {
+        this.transform.setPosition(x, y, z);
+
+        this._needsUpdate = true;
+        this.updateMatrices();
+    },
+
+    setRotation: function(x, y, z) {
+        this.transform.setRotation(x, y, z);
+
+        this._needsUpdate = true;
+        this.updateMatrices();
+    },
+
+    setScale: function(x, y, z) {
+        this.transform.setScale(x, y, z);
+
+        this._needsUpdate = true;
+        this.updateMatrices();
+    },
 });
 
 // Initialize the global camera reference
 gv.Camera = null;
-
-// Export the component
-module.exports = {
-    CameraComponent: CameraComponent
-};

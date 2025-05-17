@@ -1,4 +1,5 @@
 gv = gv || {};
+ECS = {};
 
 /**
  * Entity Component System for Cocos2d-x
@@ -6,7 +7,7 @@ gv = gv || {};
  */
 
 // Entity Manager to handle entity creation and destruction
-gv.EntityManager = {
+ECS.EntityManager = cc.Class.extend({
     _nextEntityId: 1,
     _entities: new Set(),
     
@@ -51,11 +52,11 @@ gv.EntityManager = {
      */
     getAllEntities: function() {
         return Array.from(this._entities);
-    }
-};
+    },
+});
 
 // Base Component class
-gv.Component = cc.Class.extend({
+ECS.Component = cc.Class.extend({
     /**
      * Constructor
      * @param {number} entityId - Entity this component belongs to
@@ -65,7 +66,11 @@ gv.Component = cc.Class.extend({
         this.enabled = true;
         this._started = false;
     },
-    
+
+    _name: function() {
+        throw new Error("Derived class must implement _name method");
+    },
+
     /**
      * Called when component is first added (similar to Unity's Awake)
      */
@@ -132,19 +137,16 @@ gv.Component = cc.Class.extend({
 });
 
 // Component Manager to handle component creation, retrieval and updates
-gv.ComponentManager = {
+ECS.ComponentManager = cc.Class.extend({
     _components: {},  // Type -> Array of components
     _entityComponents: {}, // Entity ID -> Type -> Array of components
     
     /**
      * Initialize the component manager
      */
-    init: function() {
+    ctor: function() {
         this._components = {};
         this._entityComponents = {};
-        
-        // Schedule updates
-        cc.director.getScheduler().scheduleUpdate(this, 0, false);
         
         // Schedule fixed updates
         this._fixedUpdateInterval = 0.02; // 50 times per second
@@ -164,16 +166,16 @@ gv.ComponentManager = {
             Log.error("ComponentManager: Cannot add component to non-existent entity " + entityId);
             return null;
         }
-        
-        // Get the component type name
-        var typeName = componentClass.name || componentClass.prototype.constructor.name;
-        if (!typeName) {
-            typeName = "Component" + Object.keys(this._components).length;
-            Log.warning("ComponentManager: Component has no name, using " + typeName);
-        }
-        
+
         // Create component instance
         var component = new componentClass(entityId);
+
+        // Get the component type name
+        var typeName = component._name();
+
+        if(!typeName) {
+            throw new Error("Component class does not have a valid name");
+        }
         
         // Initialize component arrays if needed
         if (!this._components[typeName]) {
@@ -194,7 +196,7 @@ gv.ComponentManager = {
         
         // Call awake
         component.awake();
-        
+
         Log.debug("ComponentManager: Added " + typeName + " to entity " + entityId);
         return component;
     },
@@ -207,7 +209,13 @@ gv.ComponentManager = {
      */
     getComponent: function(entityId, componentClass) {
         // Get the component type name
-        var typeName = componentClass.name || componentClass.prototype.constructor.name;
+        var typeName = componentClass;
+
+        // Check if this component class is registered
+        if (!this._components[typeName]) {
+            Log.error("ComponentManager: Component class " + typeName + " is not registered");
+            return null;
+        }
         
         // Check if entity has components of this type
         if (!this._entityComponents[entityId] || !this._entityComponents[entityId][typeName]) {
@@ -230,7 +238,13 @@ gv.ComponentManager = {
      */
     getComponents: function(entityId, componentClass) {
         // Get the component type name
-        var typeName = componentClass.name || componentClass.prototype.constructor.name;
+        var typeName = componentClass;
+
+        // check if this component class is registered
+        if (!this._components[typeName]) {
+            Log.error("ComponentManager: Component class " + typeName + " is not registered");
+            return [];
+        }
         
         // Check if entity has components of this type
         if (!this._entityComponents[entityId] || !this._entityComponents[entityId][typeName]) {
@@ -250,16 +264,13 @@ gv.ComponentManager = {
         if (!component) return;
         
         // Get the component type name
-        var typeName;
-        for (var type in this._components) {
-            if (this._components[type].indexOf(component) !== -1) {
-                typeName = type;
-                break;
-            }
+        var typeName = component;
+
+        // Check if this component class is registered
+        if (!this._components[typeName]) {
+            throw new Error("ComponentManager: Component class " + typeName + " is not registered");
         }
-        
-        if (!typeName) return;
-        
+
         // Call destroy
         component.destroy();
         
@@ -371,13 +382,63 @@ gv.ComponentManager = {
                 }
             }
         }
-    }
-};
+    },
 
-// Add ECS initialization to game startup
-gv.initECS = function() {
-    gv.ComponentManager.init();
-    Log.info("ECS System Initialized");
+    startAll: function() {
+        // Iterate through all component types
+        for (var typeName in this._components) {
+            var components = this._components[typeName];
+            
+            // Call start on each component
+            for (var i = 0; i < components.length; i++) {
+                var component = components[i];
+                component.start();
+            }
+        }
+    }
+});
+
+ECS.ECSEngine = cc.Class.extend({
+    ctor: function() {
+        this.entityManager = gv.EntityManager;
+        this.componentManager = gv.ComponentManager;
+    },
+
+    reset: function() {
+        this.entityManager._nextEntityId = 1;
+        this.entityManager._entities.clear();
+        this.componentManager._components = {};
+        this.componentManager._entityComponents = {};
+    },
+
+    run: function() {
+        this.componentManager.startAll();
+        // Schedule the ECS update using the correct Cocos2d-x API
+        cc.director.getScheduler().scheduleCallbackForTarget(this, this.update, 0, cc.REPEAT_FOREVER, 0, false);
+    },
+
+    stop: function() {
+        // Unschedule the ECS update using the correct Cocos2d-x API
+        cc.director.getScheduler().unscheduleCallbackForTarget(this, this.update);
+    },
+
+    update: function(dt) {
+        // Update the component manager
+        this.componentManager.update(dt);
+    }
+});
+
+initECS = function() {
+    gv.EntityManager = new ECS.EntityManager();
+    gv.ComponentManager = new ECS.ComponentManager();
+    gv.ECSEngine = new ECS.ECSEngine();
+
+    // create a default camera entity
+    var cameraEntity = gv.EntityManager.createEntity();
+    var transform = gv.ComponentManager.addComponent(cameraEntity, ECS.TransformComponent);
+    var cameraComponent = gv.ComponentManager.addComponent(cameraEntity, ECS.CameraComponent);
+    cameraComponent.setPosition(0, 0, 0);
+    cameraComponent.setRotation(0, 0, 0);
 };
 
 

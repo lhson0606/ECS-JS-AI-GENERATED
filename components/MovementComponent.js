@@ -2,7 +2,7 @@
  * Movement component for basic physics with GLM vector support
  */
 
-var MovementComponent = gv.Component.extend({
+ECS.MovementComponent = ECS.Component.extend({
     ctor: function(entityId) {
         this._super(entityId);
         this.velocity = new glm.vec3(0, 0, 0);
@@ -13,16 +13,20 @@ var MovementComponent = gv.Component.extend({
         this.useGravity = false;
         this.gravity = new glm.vec3(0, -9.8, 0); // Default gravity
     },
+
+    _name: function() {
+        return "MovementComponent";
+    },
     
     awake: function() {
-        Log.debug("MovementComponent: Awake");
+        // Log.debug("MovementComponent: Awake");
     },
     
     start: function() {
-        Log.debug("MovementComponent: Start");
+        // Log.debug("MovementComponent: Start");
         
         // Get the transform component
-        this.transform = this.getComponent(TransformComponent);
+        this.transform = this.getComponent("TransformComponent");
         if (!this.transform) {
             Log.error("MovementComponent requires a TransformComponent");
             return;

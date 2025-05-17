@@ -274,7 +274,7 @@ var GLMExample = cc.Scene.extend({
 });
 
 // Custom component for continuous rotation
-var RotatorComponent = gv.Component.extend({
+var RotatorComponent = ECS.Component.extend({
     ctor: function(entityId) {
         this._super(entityId);
         this.rotationSpeed = 90; // 90 degrees per second

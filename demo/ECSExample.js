@@ -3,7 +3,7 @@
  */
 
 var ECSExample = cc.Scene.extend({
-    onEnter: function() {
+    ctor: function() {
         this._super();
         
         // Initialize ECS if not already initialized
@@ -13,23 +13,23 @@ var ECSExample = cc.Scene.extend({
         var background = new cc.LayerColor(cc.color(50, 60, 70));
         this.addChild(background);
         
-        // Add example usage
-        this.addLabel("ECS Example Scene", cc.p(cc.winSize.width/2, cc.winSize.height - 50));
+        // // Add example usage
+        // this.addLabel("ECS Example Scene", cc.p(cc.winSize.width/2, cc.winSize.height - 50));
         
-        // Load sprite sheets for animations
-        cc.spriteFrameCache.addSpriteFrames("path/to/sprites.plist");
+        // // Load sprite sheets for animations
+        // cc.spriteFrameCache.addSpriteFrames("path/to/sprites.plist");
         
-        // Create player entity
-        this.createPlayerEntity();
+        // // Create player entity
+        // this.createPlayerEntity();
         
-        // Create some enemy entities
-        this.createEnemyEntity(cc.p(200, 300));
-        this.createEnemyEntity(cc.p(400, 200));
+        // // Create some enemy entities
+        // this.createEnemyEntity(cc.p(200, 300));
+        // this.createEnemyEntity(cc.p(400, 200));
         
-        // Setup input handling
-        this.setupInput();
+        // // Setup input handling
+        // this.setupInput();
         
-        Log.info("ECS Example scene started");
+        // Log.info("ECS Example scene started");
     },
     
     addLabel: function(text, position) {
@@ -168,7 +168,7 @@ var ECSExample = cc.Scene.extend({
 });
 
 // Custom Component: Player Controller
-var PlayerControllerComponent = gv.Component.extend({
+var PlayerControllerComponent = ECS.Component.extend({
     ctor: function(entityId) {
         this._super(entityId);
         this.moveSpeed = 200;
@@ -320,7 +320,7 @@ var PlayerControllerComponent = gv.Component.extend({
 });
 
 // Custom Component: Enemy Behavior
-var EnemyBehaviorComponent = gv.Component.extend({
+var EnemyBehaviorComponent = ECS.Component.extend({
     ctor: function(entityId) {
         this._super(entityId);
         this.patrolRadius = 50;

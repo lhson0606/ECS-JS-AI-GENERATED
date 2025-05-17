@@ -1,6 +1,0 @@
-// Export the components
-module.exports = {
-    TransformComponent: TransformComponent,
-    SpriteRenderer: SpriteRenderer,
-    AnimationComponent: AnimationComponent
-};

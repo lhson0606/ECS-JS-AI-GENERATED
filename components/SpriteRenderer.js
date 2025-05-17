@@ -2,7 +2,7 @@
  * SpriteRenderer component for rendering sprites with GLM transform support
  */
 
-var SpriteRenderer = gv.Component.extend({
+ECS.SpriteRenderer = ECS.Component.extend({
     ctor: function(entityId) {
         this._super(entityId);
         this.sprite = null;
@@ -13,18 +13,22 @@ var SpriteRenderer = gv.Component.extend({
         this.blendMode = null; // Use default Cocos blend mode
         this.zOrder = 0;
         this.useCamera = true; // Whether to apply camera transformations
-        this.enableFrustumCulling = true; // Whether to use camera frustum culling
+        this.enableFrustumCulling = false; // Whether to use camera frustum culling
+    },
+
+    _name: function() {
+        return "SpriteRenderer";
     },
     
     awake: function() {
-        Log.debug("SpriteRenderer: Awake");
+        // Log.debug("SpriteRenderer: Awake");
     },
     
     start: function() {
-        Log.debug("SpriteRenderer: Start");
+        // Log.debug("SpriteRenderer: Start");
         
         // Get the transform component
-        this.transform = this.getComponent(TransformComponent);
+        this.transform = this.getComponent("TransformComponent");
         if (!this.transform) {
             Log.error("SpriteRenderer requires a TransformComponent");
             return;
@@ -74,13 +78,15 @@ var SpriteRenderer = gv.Component.extend({
             // If not visible, we can skip the rest of the update
             if (!isVisible) return;
         }
-        
         if (this.useCamera && gv.Camera) {
+            // Log.debug("SpriteRenderer: Using camera for transformations");
+            // Log.debug("Camera position: " + gv.Camera.transform.position.x + ", " + gv.Camera.transform.position.y);
             // Apply camera transformation to get screen position
             var screenPos = gv.Camera.worldToScreenPoint(worldPos);
-            
+            // Log.debug("SpriteRenderer: Screen position: " + screenPos.x + ", " + screenPos.y);
+            // Log.debug("SpriteRenderer: Screen position: " + screenPos.x + ", " + screenPos.y);
             // Update sprite position in screen space
-            this.sprite.setPosition(screenPos.x, screenPos.y);
+            this.sprite.setPosition(screenPos.x + 50, screenPos.y);
             
             // Adjust scale based on camera zoom
             var scaleX = this.transform.scale.x * gv.Camera.zoom;
@@ -120,6 +126,9 @@ var SpriteRenderer = gv.Component.extend({
         
         this.sprite.setColor(color);
         this.sprite.setOpacity(Math.floor(this.color.a * 255));
+
+        // Log sprite cocos sprite's position
+        // Log.debug("SpriteRenderer: Sprite position: " + this.sprite.getPositionX() + ", " + this.sprite.getPositionY());
     },
     
     /**
@@ -149,6 +158,8 @@ var SpriteRenderer = gv.Component.extend({
             var texture = cc.textureCache.addImage(texturePath);
             this.sprite.setTexture(texture);
         }
+
+        this.sprite.setPosition(50, 50);
     },
     
     /**
@@ -157,6 +168,7 @@ var SpriteRenderer = gv.Component.extend({
      * @param {number} y - Y anchor (0-1)
      */
     setAnchor: function(x, y) {
+        // Log.debug("SpriteRenderer: Setting anchor point to " + x + ", " + y);
         this.anchor.x = x;
         this.anchor.y = y;
         
@@ -173,6 +185,7 @@ var SpriteRenderer = gv.Component.extend({
      * @param {number} a - Alpha (0-1)
      */
     setColor: function(r, g, b, a) {
+        // Log.debug("SpriteRenderer: Setting color to " + r + ", " + g + ", " + b + ", " + a);
         a = (a !== undefined) ? a : this.color.a;
         
         this.color.r = r;
@@ -188,6 +201,7 @@ var SpriteRenderer = gv.Component.extend({
      * @param {number} alpha - Alpha value (0-1)
      */
     setOpacity: function(alpha) {
+        // Log.debug("SpriteRenderer: Setting opacity to " + alpha);
         this.color.a = alpha;
         
         if (this.sprite) {
@@ -199,6 +213,7 @@ var SpriteRenderer = gv.Component.extend({
      * Update sprite color and opacity from the color vector
      */
     updateColor: function() {
+        // Log.debug("SpriteRenderer: Updating color to " + this.color.r + ", " + this.color.g + ", " + this.color.b + ", " + this.color.a);
         if (!this.sprite) return;
         
         var color = cc.color(
@@ -216,6 +231,7 @@ var SpriteRenderer = gv.Component.extend({
      * @param {number} zOrder - Z-order value
      */
     setZOrder: function(zOrder) {
+        // Log.debug("SpriteRenderer: Setting z-order to " + zOrder);
         this.zOrder = zOrder;
         
         if (this.sprite) {
@@ -229,6 +245,7 @@ var SpriteRenderer = gv.Component.extend({
      * @param {number} dst - Destination blend factor
      */
     setBlendFunc: function(src, dst) {
+        // Log.debug("SpriteRenderer: Setting blend function to src: " + src + ", dst: " + dst);
         this.blendMode = { src: src, dst: dst };
         
         if (this.sprite) {
@@ -240,6 +257,7 @@ var SpriteRenderer = gv.Component.extend({
      * Set a normal additive blend mode (good for particles, glows, etc)
      */
     setAdditiveBlending: function() {
+        // Log.debug("SpriteRenderer: Setting additive blending");
         this.setBlendFunc(cc.SRC_ALPHA, cc.ONE);
     },
     
@@ -247,6 +265,7 @@ var SpriteRenderer = gv.Component.extend({
      * Set the default alpha blend mode
      */
     setAlphaBlending: function() {
+        // Log.debug("SpriteRenderer: Setting alpha blending");
         this.setBlendFunc(cc.SRC_ALPHA, cc.ONE_MINUS_SRC_ALPHA);
     },
     
@@ -255,6 +274,7 @@ var SpriteRenderer = gv.Component.extend({
      * @param {boolean} visible - Whether the sprite should be visible
      */
     setVisible: function(visible) {
+        // Log.debug("SpriteRenderer: Setting visibility to " + visible);
         this.visible = visible;
         
         if (this.sprite) {
@@ -267,6 +287,7 @@ var SpriteRenderer = gv.Component.extend({
      * @param {boolean} useCamera - Whether to apply camera transformations
      */
     setUseCamera: function(useCamera) {
+        // Log.debug("SpriteRenderer: Setting useCamera to " + useCamera);
         this.useCamera = useCamera;
     },
     
@@ -275,6 +296,7 @@ var SpriteRenderer = gv.Component.extend({
      * @param {boolean} enabled - Whether to use frustum culling 
      */
     setFrustumCulling: function(enabled) {
+        // Log.debug("SpriteRenderer: Setting frustum culling to " + enabled);
         this.enableFrustumCulling = enabled === true;
     },
     
@@ -283,6 +305,7 @@ var SpriteRenderer = gv.Component.extend({
      * @param {string} frameName - Name of the sprite frame
      */
     setSpriteFrame: function(frameName) {
+        // Log.debug("SpriteRenderer: Setting sprite frame to " + frameName);
         var frame = cc.spriteFrameCache.getSpriteFrame(frameName);
         if (frame) {
             if (!this.sprite) {
@@ -300,9 +323,38 @@ var SpriteRenderer = gv.Component.extend({
     
     destroy: function() {
         // Remove sprite from scene
+        // Log.debug("SpriteRenderer: Destroying sprite");
         if (this.sprite) {
             this.sprite.removeFromParent(true);
             this.sprite = null;
         }
     }
 });
+
+// gv = gv || {};
+
+// ECS.SpriteRenderer = ECS.Component.extend({
+//     ctor: function(entityId) {
+//         this._super(entityId);
+//         this.sprite = null;
+//         this.texturePath = "";
+
+        
+//     },
+
+//     _name: function() {
+//         return "SpriteRenderer";
+//     },
+
+//     setTexture: function(texturePath) {
+//         this.texturePath = texturePath;
+//         if (!this.sprite) {
+//             this.sprite = new cc.Sprite(texturePath);
+//             this.sprite.setPosition(50, 50);
+//             fr.getScene().addChild(this.sprite);
+//         } else {
+//             this.sprite.setTexture(texturePath);
+//         }
+//     }
+// });
+

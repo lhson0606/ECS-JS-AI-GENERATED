@@ -2,7 +2,7 @@
  * Transform component for position, rotation, and scale using GLM vectors
  */
 
-var TransformComponent = gv.Component.extend({
+ECS.TransformComponent = ECS.Component.extend({
     ctor: function(entityId) {
         this._super(entityId);
         this.position = new glm.vec3(0, 0, 0);
@@ -13,13 +13,17 @@ var TransformComponent = gv.Component.extend({
         this.parent = null;
         this.children = [];
     },
+
+    _name: function() {
+        return "TransformComponent";
+    },
     
     awake: function() {
-        Log.debug("TransformComponent: Awake - Using GLM vectors");
+        // Log.debug("TransformComponent: Awake - Using GLM vectors");
     },
     
     start: function() {
-        Log.debug("TransformComponent: Start");
+        // Log.debug("TransformComponent: Start");
     },
     
     update: function(dt) {
