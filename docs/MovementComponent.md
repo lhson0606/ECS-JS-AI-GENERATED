@@ -1,16 +1,18 @@
 # MovementComponent
 
 ## About
+
 The MovementComponent provides basic physics-like movement for entities. It manages properties like velocity, acceleration, friction, and mass, making it easy to implement natural movement in your game.
 
 ## Usage
+
 Add a MovementComponent to an entity with a TransformComponent to enable physics-based movement. The component automatically updates the entity's position based on velocity and acceleration.
 
 ```javascript
 // Create an entity with transform and movement components
-var entityId = gv.EntityManager.createEntity();
-var transform = gv.ComponentManager.addComponent(entityId, TransformComponent);
-var movement = gv.ComponentManager.addComponent(entityId, MovementComponent);
+var entityId = ECS.gI().EntityManager.createEntity();
+var transform = ECS.gI().ComponentManager.addComponent(entityId, TransformComponent);
+var movement = ECS.gI().ComponentManager.addComponent(entityId, MovementComponent);
 
 // Set initial position
 transform.setPosition(100, 100, 0);
@@ -30,10 +32,10 @@ movement.setVelocity(100, 50, 0); // Set specific velocity
 
 ```javascript
 // Create a character with physics movement
-var characterId = gv.EntityManager.createEntity();
-var transform = gv.ComponentManager.addComponent(characterId, TransformComponent);
-var sprite = gv.ComponentManager.addComponent(characterId, SpriteRenderer);
-var movement = gv.ComponentManager.addComponent(characterId, MovementComponent);
+var characterId = ECS.gI().EntityManager.createEntity();
+var transform = ECS.gI().ComponentManager.addComponent(characterId, TransformComponent);
+var sprite = ECS.gI().ComponentManager.addComponent(characterId, SpriteRenderer);
+var movement = ECS.gI().ComponentManager.addComponent(characterId, MovementComponent);
 
 // Configure movement properties
 movement.maxSpeed = 300;
@@ -51,7 +53,7 @@ function handleInput(dt) {
     } else if (isRightKeyPressed) {
         movement.applyForce(2000, 0, 0);
     }
-    
+  
     // Handle jumping
     if (isJumpKeyPressed && isOnGround) {
         // Apply an upward impulse for jumping
@@ -61,6 +63,7 @@ function handleInput(dt) {
 ```
 
 ## Notice
+
 - The MovementComponent requires a TransformComponent on the same entity.
 - Forces are applied each frame and reset after updating velocity.
 - Impulses are immediate changes to velocity.

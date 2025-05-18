@@ -42,56 +42,56 @@ var ECSExample = cc.Scene.extend({
     
     createPlayerEntity: function() {
         // Create entity
-        var playerEntity = gv.EntityManager.createEntity();
+        var playerEntity = ECS.gI().EntityManager.createEntity();
         this.playerEntity = playerEntity;
         
         // Add transform component
-        var transform = gv.ComponentManager.addComponent(playerEntity, TransformComponent);
+        var transform = ECS.gI().ComponentManager.addComponent(playerEntity, TransformComponent);
         transform.setPosition(cc.winSize.width/2, cc.winSize.height/2);
         
         // Add sprite component
-        var sprite = gv.ComponentManager.addComponent(playerEntity, SpriteComponent);
+        var sprite = ECS.gI().ComponentManager.addComponent(playerEntity, SpriteComponent);
         sprite.setTexture("res/player_idle_1.png");
         
         // Add animation component
-        var animation = gv.ComponentManager.addComponent(playerEntity, AnimationComponent);
+        var animation = ECS.gI().ComponentManager.addComponent(playerEntity, AnimationComponent);
         animation.addAnimation("idle", "player_idle_%d.png", 8);
         animation.addAnimation("run", "player_run_%d.png", 8);
         animation.setFrameRate(10);
         animation.play("idle");
         
         // Add movement component
-        var movement = gv.ComponentManager.addComponent(playerEntity, MovementComponent);
+        var movement = ECS.gI().ComponentManager.addComponent(playerEntity, MovementComponent);
         movement.maxSpeed = 200;
         movement.friction = 0.9;
         
         // Add player controller component (custom component)
-        var controller = gv.ComponentManager.addComponent(playerEntity, PlayerControllerComponent);
+        var controller = ECS.gI().ComponentManager.addComponent(playerEntity, PlayerControllerComponent);
         
         Log.debug("Created player entity with ID: " + playerEntity);
     },
     
     createEnemyEntity: function(position) {
         // Create entity
-        var enemyEntity = gv.EntityManager.createEntity();
+        var enemyEntity = ECS.gI().EntityManager.createEntity();
         
         // Add transform component
-        var transform = gv.ComponentManager.addComponent(enemyEntity, TransformComponent);
+        var transform = ECS.gI().ComponentManager.addComponent(enemyEntity, TransformComponent);
         transform.setPosition(position.x, position.y);
         
         // Add sprite component
-        var sprite = gv.ComponentManager.addComponent(enemyEntity, SpriteComponent);
+        var sprite = ECS.gI().ComponentManager.addComponent(enemyEntity, SpriteComponent);
         sprite.setTexture("res/enemy_idle_1.png");
         
         // Add animation component
-        var animation = gv.ComponentManager.addComponent(enemyEntity, AnimationComponent);
+        var animation = ECS.gI().ComponentManager.addComponent(enemyEntity, AnimationComponent);
         animation.addAnimation("idle", "enemy_idle_%d.png", 4);
         animation.addAnimation("attack", "enemy_attack_%d.png", 6);
         animation.setFrameRate(8);
         animation.play("idle");
         
         // Add enemy behavior component (custom component)
-        var behavior = gv.ComponentManager.addComponent(enemyEntity, EnemyBehaviorComponent);
+        var behavior = ECS.gI().ComponentManager.addComponent(enemyEntity, EnemyBehaviorComponent);
         behavior.setPatrolRadius(100);
         
         Log.debug("Created enemy entity with ID: " + enemyEntity);
@@ -469,7 +469,7 @@ var EnemyBehaviorComponent = ECS.Component.extend({
     findPlayerEntity: function() {
         // In a real game, you would have a more efficient way to find the player
         // For this example, we'll just look for an entity with a PlayerControllerComponent
-        var entities = gv.EntityManager.getAllEntities();
+        var entities = ECS.gI().EntityManager.getAllEntities();
         
         for (var i = 0; i < entities.length; i++) {
             var controller = gv.ComponentManager.getComponent(entities[i], PlayerControllerComponent);

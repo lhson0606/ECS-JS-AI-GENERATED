@@ -18,18 +18,18 @@ Unlike traditional ECS architectures, this implementation doesn't have separate 
 
 ```javascript
 // Create a new entity
-var entityId = gv.EntityManager.createEntity();
+var entityId = ECS.gI().EntityManager.createEntity();
 ```
 
 ### Adding Components
 
 ```javascript
 // Add a transform component to the entity
-var transform = gv.ComponentManager.addComponent(entityId, TransformComponent);
+var transform = ECS.gI().ComponentManager.addComponent(entityId, TransformComponent);
 transform.setPosition(100, 200);
 
 // Add a sprite component
-var sprite = gv.ComponentManager.addComponent(entityId, SpriteComponent);
+var sprite = ECS.gI().ComponentManager.addComponent(entityId, SpriteComponent);
 sprite.setTexture("res/images/player.png");
 ```
 
@@ -60,23 +60,23 @@ From outside:
 
 ```javascript
 // Get a component from an entity
-var transform = gv.ComponentManager.getComponent(entityId, TransformComponent);
+var transform = ECS.gI().ComponentManager.getComponent(entityId, TransformComponent);
 
 // Get all components of a type
-var sprites = gv.ComponentManager.getComponents(entityId, SpriteComponent);
+var sprites = ECS.gI().ComponentManager.getComponents(entityId, SpriteComponent);
 ```
 
 ### Removing Components or Entities
 
 ```javascript
 // Remove a specific component
-gv.ComponentManager.removeComponent(entityId, component);
+ECS.gI().ComponentManager.removeComponent(entityId, component);
 
 // Remove all components from an entity
-gv.ComponentManager.removeAllComponents(entityId);
+ECS.gI().ComponentManager.removeAllComponents(entityId);
 
 // Destroy an entity (also removes all its components)
-gv.EntityManager.destroyEntity(entityId);
+ECS.gI().EntityManager.destroyEntity(entityId);
 ```
 
 ## Example Components
@@ -99,32 +99,32 @@ var MyCustomComponent = gv.Component.extend({
         // Initialize properties
         this.myProperty = 0;
     },
-    
+  
     awake: function() {
         // Called when component is added
         Log.debug("MyCustomComponent: Awake");
     },
-    
+  
     start: function() {
         // Called before first update
         this.otherComponent = this.getComponent(OtherComponent);
     },
-    
+  
     update: function(dt) {
         // Called every frame
         this.myProperty += dt;
     },
-    
+  
     fixedUpdate: function(dt) {
         // Called at fixed intervals
         // Good for physics calculations
     },
-    
+  
     destroy: function() {
         // Called when component is removed
         // Clean up resources here
     },
-    
+  
     myCustomMethod: function() {
         // Your custom functionality
     }

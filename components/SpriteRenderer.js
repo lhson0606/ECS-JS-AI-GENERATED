@@ -30,8 +30,7 @@ ECS.SpriteRenderer = ECS.Component.extend({
         // Get the transform component
         this.transform = this.getComponent("TransformComponent");
         if (!this.transform) {
-            Log.error("SpriteRenderer requires a TransformComponent");
-            return;
+            throw new Error("SpriteRenderer requires a TransformComponent");
         }
         
         // Create sprite if texture is set
@@ -127,6 +126,8 @@ ECS.SpriteRenderer = ECS.Component.extend({
         this.sprite.setColor(color);
         this.sprite.setOpacity(Math.floor(this.color.a * 255));
 
+        // this.sprite.setPosition(50, 50);
+        // Log.debug("sprite: " + this.sprite);
         // Log sprite cocos sprite's position
         // Log.debug("SpriteRenderer: Sprite position: " + this.sprite.getPositionX() + ", " + this.sprite.getPositionY());
     },
@@ -144,7 +145,8 @@ ECS.SpriteRenderer = ECS.Component.extend({
             this.sprite.setAnchorPoint(this.anchor.x, this.anchor.y);
             
             // Add to scene with appropriate z-order
-            cc.director.getRunningScene().addChild(this.sprite, this.zOrder);
+            ECS.gI().layer.addChild(this.sprite, this.zOrder);
+            // cc.director.getRunningScene().addChild(this.sprite, this.zOrder);
             
             // Apply color and opacity
             this.updateColor();
@@ -159,7 +161,7 @@ ECS.SpriteRenderer = ECS.Component.extend({
             this.sprite.setTexture(texture);
         }
 
-        this.sprite.setPosition(50, 50);
+        // this.sprite.setPosition(50, 50);
     },
     
     /**
@@ -288,6 +290,12 @@ ECS.SpriteRenderer = ECS.Component.extend({
      */
     setUseCamera: function(useCamera) {
         // Log.debug("SpriteRenderer: Setting useCamera to " + useCamera);
+        if (useCamera) {
+            // Check there is a camera component
+            if (!ECS.gI().camera) {
+                throw new Error("SpriteRenderer: No camera component found, but useCamera is set to true");
+            }
+        }
         this.useCamera = useCamera;
     },
     
@@ -330,31 +338,4 @@ ECS.SpriteRenderer = ECS.Component.extend({
         }
     }
 });
-
-// gv = gv || {};
-
-// ECS.SpriteRenderer = ECS.Component.extend({
-//     ctor: function(entityId) {
-//         this._super(entityId);
-//         this.sprite = null;
-//         this.texturePath = "";
-
-        
-//     },
-
-//     _name: function() {
-//         return "SpriteRenderer";
-//     },
-
-//     setTexture: function(texturePath) {
-//         this.texturePath = texturePath;
-//         if (!this.sprite) {
-//             this.sprite = new cc.Sprite(texturePath);
-//             this.sprite.setPosition(50, 50);
-//             fr.getScene().addChild(this.sprite);
-//         } else {
-//             this.sprite.setTexture(texturePath);
-//         }
-//     }
-// });
 

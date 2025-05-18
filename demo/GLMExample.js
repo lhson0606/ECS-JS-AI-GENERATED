@@ -59,7 +59,7 @@ var GLMExample = cc.Scene.extend({
     
     createPlayerEntity: function() {
         // Create parent entity (player body)
-        var playerEntity = gv.EntityManager.createEntity();
+        var playerEntity = ECS.gI().EntityManager.createEntity();
         this.playerEntity = playerEntity;
         
         // Add transform component to the player
@@ -79,20 +79,20 @@ var GLMExample = cc.Scene.extend({
         animation.play("idle");
         
         // Add movement component
-        var movement = gv.ComponentManager.addComponent(playerEntity, MovementComponent);
+        var movement = ECS.gI().ComponentManager.addComponent(playerEntity, MovementComponent);
         movement.maxSpeed = 200;
         movement.friction = 0.9;
         
         // Create child entity (weapon)
-        var weaponEntity = gv.EntityManager.createEntity();
+        var weaponEntity = ECS.gI().EntityManager.createEntity();
         
         // Add transform to weapon (as child of player)
-        var weaponTransform = gv.ComponentManager.addComponent(weaponEntity, TransformComponent);
+        var weaponTransform = ECS.gI().ComponentManager.addComponent(weaponEntity, TransformComponent);
         weaponTransform.setPosition(30, 0, 0); // Offset from player
         weaponTransform.setParent(transform);  // Set parent-child relationship
         
         // Add sprite renderer to weapon
-        var weaponSprite = gv.ComponentManager.addComponent(weaponEntity, SpriteRenderer);
+        var weaponSprite = ECS.gI().ComponentManager.addComponent(weaponEntity, SpriteRenderer);
         weaponSprite.setTexture("res/game/images/weapon.png");
         
         Log.debug("Created player entity hierarchy");
@@ -102,14 +102,14 @@ var GLMExample = cc.Scene.extend({
     
     createRotatingObject: function(position, texturePath) {
         // Create entity
-        var entity = gv.EntityManager.createEntity();
+        var entity = ECS.gI().EntityManager.createEntity();
         
         // Add transform
-        var transform = gv.ComponentManager.addComponent(entity, TransformComponent);
+        var transform = ECS.gI().ComponentManager.addComponent(entity, TransformComponent);
         transform.setPosition(position.x, position.y, 0);
         
         // Add sprite renderer
-        var sprite = gv.ComponentManager.addComponent(entity, SpriteRenderer);
+        var sprite = ECS.gI().ComponentManager.addComponent(entity, SpriteRenderer);
         sprite.setTexture(texturePath);
         
         // Add a custom component for continuous rotation

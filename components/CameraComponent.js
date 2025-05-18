@@ -55,7 +55,7 @@ ECS.CameraComponent = ECS.Component.extend({
 
     update: function(dt) {
         if (!this.transform) return;
-
+        // Log.debug("Camera position: " + this.transform.position.x + ", " + this.transform.position.y + ", " + this.transform.position.z);
         // this.moveTo(this.transform.position.x + dt * 5, this.transform.position.y + dt*5, this.transform.position.z);
         // this.setZoom(this.zoom - dt * 0.1);
 
@@ -443,8 +443,8 @@ ECS.CameraComponent = ECS.Component.extend({
      * @returns {Object} The component or null if not found
      */
     getEntityComponent: function(entityId, componentType) {
-        if (!gv.entityManager) return null;
-        return gv.entityManager.getComponent(entityId, componentType);
+        if (!ECS.gI().EntityManager) return null;
+        return ECS.gI().EntityManager.getComponent(entityId, componentType);
     },
 
     setPosition: function(x, y, z) {
@@ -464,6 +464,12 @@ ECS.CameraComponent = ECS.Component.extend({
     setScale: function(x, y, z) {
         this.transform.setScale(x, y, z);
 
+        this._needsUpdate = true;
+        this.updateMatrices();
+    },
+
+    zoomBy: function(delta) {
+        this.zoom += delta;
         this._needsUpdate = true;
         this.updateMatrices();
     },

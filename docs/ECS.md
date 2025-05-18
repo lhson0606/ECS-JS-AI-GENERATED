@@ -1,6 +1,7 @@
 # Entity Component System (ECS)
 
 ## About
+
 The Entity Component System (ECS) is an architectural pattern used for organizing game objects. It separates identity (Entities), data (Components), and behavior (Systems). This implementation follows a Unity-like approach where components have lifecycle methods and handle their own updates.
 
 ## Components
@@ -18,14 +19,14 @@ The ECS framework provides these core components:
 
 ```javascript
 // Create an entity
-var entityId = gv.EntityManager.createEntity();
+var entityId = ECS.gI().EntityManager.createEntity();
 
 // Add components
-var transform = gv.ComponentManager.addComponent(entityId, TransformComponent);
-var sprite = gv.ComponentManager.addComponent(entityId, SpriteRenderer);
+var transform = ECS.gI().ComponentManager.addComponent(entityId, TransformComponent);
+var sprite = ECS.gI().ComponentManager.addComponent(entityId, SpriteRenderer);
 
 // Destroy an entity when no longer needed
-gv.EntityManager.destroyEntity(entityId);
+ECS.gI().EntityManager.destroyEntity(entityId);
 ```
 
 ### Component Lifecycle
@@ -42,38 +43,38 @@ Components have these lifecycle methods:
 ```javascript
 // Game setup
 function createPlayer() {
-    var playerId = gv.EntityManager.createEntity();
-    
+    var playerId = ECS.gI().EntityManager.createEntity();
+  
     // Add required components
     var transform = gv.ComponentManager.addComponent(playerId, TransformComponent);
-    var sprite = gv.ComponentManager.addComponent(playerId, SpriteRenderer);
-    var animator = gv.ComponentManager.addComponent(playerId, AnimationComponent);
-    var movement = gv.ComponentManager.addComponent(playerId, MovementComponent);
-    
+    var sprite = ECS.gI().ComponentManager.addComponent(playerId, SpriteRenderer);
+    var animator = ECS.gI().ComponentManager.addComponent(playerId, AnimationComponent);
+    var movement = ECS.gI().ComponentManager.addComponent(playerId, MovementComponent);
+  
     // Configure components
     transform.setPosition(cc.winSize.width/2, cc.winSize.height/2, 0);
     sprite.setTexture("res/sprites/player.png");
-    
+  
     // Add animations
     animator.addAnimation("idle", "player_idle_%d.png", 4);
     animator.addAnimation("run", "player_run_%d.png", 8);
     animator.play("idle");
-    
+  
     // Configure movement
     movement.maxSpeed = 300;
     movement.friction = 0.9;
-    
+  
     return playerId;
 }
 
 // Input handling
 function handlePlayerInput(playerId, dt) {
-    var movement = gv.ComponentManager.getComponent(playerId, MovementComponent);
-    var animator = gv.ComponentManager.getComponent(playerId, AnimationComponent);
-    
+    var movement = ECS.gI().ComponentManager.getComponent(playerId, MovementComponent);
+    var animator = ECS.gI().ComponentManager.getComponent(playerId, AnimationComponent);
+  
     // Handle movement
     var force = {x: 0, y: 0};
-    
+  
     if (isKeyPressed(cc.KEY.left)) {
         force.x = -1000;
         animator.play("run");
@@ -83,7 +84,7 @@ function handlePlayerInput(playerId, dt) {
     } else {
         animator.play("idle");
     }
-    
+  
     if (force.x !== 0 || force.y !== 0) {
         movement.applyForce(force.x, force.y, 0);
     }
@@ -91,6 +92,7 @@ function handlePlayerInput(playerId, dt) {
 ```
 
 ## Notice
+
 - Components should be added in a logical order, as some depend on others (e.g., SpriteRenderer depends on TransformComponent).
 - The ECS framework automatically handles the update cycle for all components.
 - Getting components with `getComponent()` returns the first component of that type on the entity.

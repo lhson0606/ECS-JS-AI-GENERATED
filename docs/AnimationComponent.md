@@ -1,17 +1,19 @@
 # AnimationComponent
 
 ## About
+
 The AnimationComponent provides frame-by-frame animation capabilities for entities with a SpriteRenderer. It manages animations as collections of sprite frames and handles animation playback with controls for looping, frame rate, and callbacks.
 
 ## Usage
+
 Add an AnimationComponent to an entity that already has a SpriteRenderer to enable animations. First, add animations to the component, then play the animations when needed.
 
 ```javascript
 // Create an entity with necessary components
-var entityId = gv.EntityManager.createEntity();
-var transform = gv.ComponentManager.addComponent(entityId, TransformComponent);
-var spriteRenderer = gv.ComponentManager.addComponent(entityId, SpriteRenderer);
-var animator = gv.ComponentManager.addComponent(entityId, AnimationComponent);
+var entityId = ECS.gI().EntityManager.createEntity();
+var transform = ECS.gI().ComponentManager.addComponent(entityId, TransformComponent);
+var spriteRenderer = ECS.gI().ComponentManager.addComponent(entityId, SpriteRenderer);
+var animator = ECS.gI().ComponentManager.addComponent(entityId, AnimationComponent);
 
 // Load a sprite sheet first (typically done once at game startup)
 cc.spriteFrameCache.addSpriteFrames("res/sprites/character_sheet.plist");
@@ -41,10 +43,10 @@ animator.play("attack", false, function() {
 
 ```javascript
 // Character with different movement animations
-var characterId = gv.EntityManager.createEntity();
-var transform = gv.ComponentManager.addComponent(characterId, TransformComponent);
-var sprite = gv.ComponentManager.addComponent(characterId, SpriteRenderer);
-var animator = gv.ComponentManager.addComponent(characterId, AnimationComponent);
+var characterId = ECS.gI().EntityManager.createEntity();
+var transform = ECS.gI().ComponentManager.addComponent(characterId, TransformComponent);
+var sprite = ECS.gI().ComponentManager.addComponent(characterId, SpriteRenderer);
+var animator = ECS.gI().ComponentManager.addComponent(characterId, AnimationComponent);
 
 // Add idle, run and jump animations
 animator.addAnimation("idle", "hero_idle_%d.png", 4);
@@ -70,6 +72,7 @@ function updateCharacterAnimation(isRunning, isJumping) {
 ```
 
 ## Notice
+
 - The AnimationComponent requires a SpriteRenderer on the same entity.
 - Sprite frames must be preloaded in the sprite frame cache before creating animations.
 - Animation names must be unique within the component.

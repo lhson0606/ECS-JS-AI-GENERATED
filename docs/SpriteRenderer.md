@@ -1,16 +1,18 @@
 # SpriteRenderer
 
 ## About
+
 The SpriteRenderer component renders a sprite for an entity with support for camera transformations, frustum culling, and other visual properties. It works with the TransformComponent to position the sprite in the world.
 
 ## Usage
+
 Add a SpriteRenderer to an entity after adding a TransformComponent to render a sprite at the entity's position. SpriteRenderer handles sprite appearance, blend modes, anchor points, and camera integration.
 
 ```javascript
 // Create an entity with transform and sprite renderer
-var entityId = gv.EntityManager.createEntity();
-var transform = gv.ComponentManager.addComponent(entityId, TransformComponent);
-var spriteRenderer = gv.ComponentManager.addComponent(entityId, SpriteRenderer);
+var entityId = ECS.gI().EntityManager.createEntity();
+var transform = ECS.gI().ComponentManager.addComponent(entityId, TransformComponent);
+var spriteRenderer = ECS.gI().ComponentManager.addComponent(entityId, SpriteRenderer);
 
 // Set position using transform
 transform.setPosition(100, 200, 0);
@@ -26,9 +28,9 @@ spriteRenderer.setColor(1, 0.5, 0.5, 0.8);  // Red tint with 80% opacity
 
 ```javascript
 // Create a UI element that doesn't use camera transformations
-var uiEntityId = gv.EntityManager.createEntity();
-var transform = gv.ComponentManager.addComponent(uiEntityId, TransformComponent);
-var sprite = gv.ComponentManager.addComponent(uiEntityId, SpriteRenderer);
+var uiEntityId = ECS.gI().EntityManager.createEntity();
+var transform = ECS.gI().ComponentManager.addComponent(uiEntityId, TransformComponent);
+var sprite = ECS.gI().ComponentManager.addComponent(uiEntityId, SpriteRenderer);
 
 // Position in screen space
 transform.setPosition(cc.winSize.width - 50, 50, 0);
@@ -44,6 +46,7 @@ sprite.setTexture("res/ui/button.png");
 ```
 
 ## Notice
+
 - The SpriteRenderer requires a TransformComponent on the same entity.
 - Frustum culling is enabled by default to optimize rendering (sprites out of camera view aren't drawn).
 - The anchor point is (0.5, 0.5) by default, which centers the sprite at the entity's position.
