@@ -44,7 +44,7 @@ ECS.CameraComponent = ECS.Component.extend({
         this.updateMatrices();
         
         // Set as global camera if no other camera is active
-        if (!gv.Camera) {
+        if (!ECS.gI().camera) {
             this.setAsMain();
         }
     },
@@ -100,7 +100,7 @@ ECS.CameraComponent = ECS.Component.extend({
         // Calculate view matrix (inverse of transform's world matrix)
         var position = this.transform.getWorldPosition();
         var lookAt = glm.add(position, new glm.vec3(0, 0, -1)); // Look along negative Z
-        var up = new glm.vec3(0, 1, 0); // Y is up
+        var up = new glm.vec3(0, -1, 0); // Y is up
         
         this.viewMatrix = glm.lookAt(position, lookAt, up);
         
@@ -124,7 +124,8 @@ ECS.CameraComponent = ECS.Component.extend({
      * Set this camera as the main camera (globally accessible)
      */
     setAsMain: function() {
-        gv.Camera = this;
+        ECS.gI().camera = this;
+        
         this.active = true;
         Log.debug("CameraComponent: Set as main camera");
     },
@@ -474,6 +475,3 @@ ECS.CameraComponent = ECS.Component.extend({
         this.updateMatrices();
     },
 });
-
-// Initialize the global camera reference
-gv.Camera = null;

@@ -15,12 +15,12 @@ CameraDemo = cc.Layer.extend({
         ECS.gI().createContext(this);
         const sizes = cc.director.getVisibleSize();
         // gv.EntityFactory.createCameraEntity(glm.vec3(0, 0, 0));
-        for (let i = 0; i < 64; i++) {
-            for (let j = 0; j < 64; j++) {
-                var logo = gv.EntityFactory.createCocosSpriteEntityWithPosition(res.images.ui.LOGO, glm.vec3(i * 50, j * 50, 0));
-                // logo.setScale(0.5);
-            }
-        }
+        // for (let i = 0; i < 64; i++) {
+        //     for (let j = 0; j < 64; j++) {
+        //         var logo = gv.EntityFactory.createCocosSpriteEntityWithPosition(res.images.ui.LOGO, glm.vec3(50, 50, 0));
+        //         // logo.setScale(0.5);
+        //     }
+        // }
         this.player = gv.EntityFactory.createCocosSpriteEntity(res.images.ui.LOGO);
         this.player2 = gv.EntityFactory.createCocosSpriteEntityWithPosition(res.images.ui.LOGO, glm.vec3(50, -150, 0));
         // var logo = cc.Sprite(res.images.ui.LOGO);
@@ -54,11 +54,10 @@ CameraDemo = cc.Layer.extend({
         // Zoom out
         // camera.zoom(-0.1);
 
-        // var playerTransform = ECS.gI().ComponentManager.getComponent(this.player, "TransformComponent");
-        // playerTransform.translate(dt * 5, dt * 5, dt * 5);
+        var playerTransform = ECS.gI().ComponentManager.getComponent(this.player, "TransformComponent");
+        // playerTransform.translate(dt, dt * 50, 0);
+        // playerTransform.rotate(0, 0, dt * 50);
         // move player
-        // playerTransform.setPosition(playerTransform.position.x + dt * 5, playerTransform.position.y + dt * 5, playerTransform.position.z);
-        // Log.debug("Player position: " + playerTransform.position.x + ", " + playerTransform.position.y + ", " + playerTransform.position.z);
     },
 
     destroy: function() {

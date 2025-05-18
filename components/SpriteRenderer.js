@@ -51,7 +51,7 @@ ECS.SpriteRenderer = ECS.Component.extend({
         var worldPos = this.transform.getWorldPosition();
         
         // Frustum culling - check if the entity is out of camera view
-        if (this.useCamera && gv.Camera && this.enableFrustumCulling) {
+        if (this.useCamera && ECS.gI().camera && this.enableFrustumCulling) {
             // Create a simple bounding box for this entity
             var contentSize = this.sprite.getContentSize();
             var width = contentSize.width * this.transform.scale.x;
@@ -71,32 +71,32 @@ ECS.SpriteRenderer = ECS.Component.extend({
             };
             
             // Check if the entity is visible in the camera frustum
-            var isVisible = gv.Camera.isBoxVisible(aabb);
+            var isVisible = ECS.gI().camera.isBoxVisible(aabb);
             this.sprite.setVisible(isVisible);
             
             // If not visible, we can skip the rest of the update
             if (!isVisible) return;
         }
-        if (this.useCamera && gv.Camera) {
+        if (this.useCamera && ECS.gI().camera) {
             // Log.debug("SpriteRenderer: Using camera for transformations");
-            // Log.debug("Camera position: " + gv.Camera.transform.position.x + ", " + gv.Camera.transform.position.y);
+            // Log.debug("Camera position: " + ECS.gI().camera.transform.position.x + ", " + ECS.gI().camera.transform.position.y);
             // Apply camera transformation to get screen position
-            var screenPos = gv.Camera.worldToScreenPoint(worldPos);
+            var screenPos = ECS.gI().camera.worldToScreenPoint(worldPos);
             // Log.debug("SpriteRenderer: Screen position: " + screenPos.x + ", " + screenPos.y);
             // Log.debug("SpriteRenderer: Screen position: " + screenPos.x + ", " + screenPos.y);
             // Update sprite position in screen space
             this.sprite.setPosition(screenPos.x + 50, screenPos.y);
             
             // Adjust scale based on camera zoom
-            var scaleX = this.transform.scale.x * gv.Camera.zoom;
-            var scaleY = this.transform.scale.y * gv.Camera.zoom;
+            var scaleX = this.transform.scale.x * ECS.gI().camera.zoom;
+            var scaleY = this.transform.scale.y * ECS.gI().camera.zoom;
             this.sprite.setScaleX(scaleX);
             this.sprite.setScaleY(scaleY);
             
             // Apply camera rotation if needed
             var finalRotation = this.transform.rotation.z;
-            if (gv.Camera.transform && gv.Camera.applyRotation) {
-                finalRotation -= gv.Camera.transform.rotation.z;
+            if (ECS.gI().camera.transform && ECS.gI().camera.applyRotation) {
+                finalRotation -= ECS.gI().camera.transform.rotation.z;
             }
             this.sprite.setRotation(finalRotation);
         } else {
