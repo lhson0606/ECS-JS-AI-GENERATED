@@ -17,7 +17,7 @@ CameraDemo = cc.Layer.extend({
         // gv.EntityFactory.createCameraEntity(glm.vec3(0, 0, 0));
         // for (let i = 0; i < 64; i++) {
         //     for (let j = 0; j < 64; j++) {
-        //         var logo = gv.EntityFactory.createCocosSpriteEntityWithPosition(res.images.ui.LOGO, glm.vec3(50, 50, 0));
+        //         var logo = gv.EntityFactory.createCocosSpriteEntityWithPosition(res.images.ui.LOGO, glm.vec3(50*i, 50*j, 0));
         //         // logo.setScale(0.5);
         //     }
         // }
@@ -31,8 +31,9 @@ CameraDemo = cc.Layer.extend({
     },
 
     update: function(dt) {
-        var camera = ECS.gI().camera;
-        var cameraTransform = ECS.gI().ComponentManager.getComponent(camera.entityId, "TransformComponent");
+        let camera = ECS.gI().camera;
+        let cameraTransform = ECS.gI().ComponentManager.getComponent(camera.entityId, "TransformComponent");
+        let cameraPosition = cameraTransform.position;
 
         // Move camera up
         // camera.moveTo(cameraPosition.x, cameraPosition.y + dt * 50, cameraPosition.z);
@@ -40,7 +41,7 @@ CameraDemo = cc.Layer.extend({
         // camera.moveTo(cameraPosition.x, cameraPosition.y - dt * 50, cameraPosition.z);
         //
         // // Move camera left
-        // camera.moveTo(cameraPosition.x - dt * 50, cameraPosition.y, cameraPosition.z);
+        // camera.moveBy(-dt * 50, 0, 0);
         // // Move camera right
         // camera.moveTo(cameraPosition.x + dt * 50, cameraPosition.y, cameraPosition.z);
 
@@ -53,6 +54,8 @@ CameraDemo = cc.Layer.extend({
         // camera.zoomBy(5 * dt);
         // Zoom out
         // camera.zoom(-0.1);
+
+        camera.spin(-dt * 50);
 
         var playerTransform = ECS.gI().ComponentManager.getComponent(this.player, "TransformComponent");
         // playerTransform.translate(dt, dt * 50, 0);

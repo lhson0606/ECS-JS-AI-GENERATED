@@ -1,5 +1,5 @@
 /**
- * Camera component for the ECS system
+ * A 2D Camera component for the ECS system
  * This provides view transformations for rendering entities
  */
 
@@ -25,6 +25,7 @@ ECS.CameraComponent = ECS.Component.extend({
         this._followTarget = null;
         this._smoothFollow = false;
         this._smoothSpeed = 5;
+        this.up = new glm.vec3(0, -1, 0); // Y is up
     },
 
     _name: function() {
@@ -98,11 +99,10 @@ ECS.CameraComponent = ECS.Component.extend({
         }
         
         // Calculate view matrix (inverse of transform's world matrix)
-        var position = this.transform.getWorldPosition();
+        var position = this.transform.getWorldPosition();   
         var lookAt = glm.add(position, new glm.vec3(0, 0, -1)); // Look along negative Z
-        var up = new glm.vec3(0, -1, 0); // Y is up
         
-        this.viewMatrix = glm.lookAt(position, lookAt, up);
+        this.viewMatrix = glm.lookAt(position, lookAt, this.up);
         
         // For 2D: use orthographic projection
         var halfWidth = (this.viewportSize.x / this.zoom) * 0.5;
@@ -375,13 +375,17 @@ ECS.CameraComponent = ECS.Component.extend({
      * @param {Object} aabb - Axis-aligned bounding box {min: glm.vec3, max: glm.vec3}
      * @returns {boolean} True if the box is visible
      */
-    isBoxVisible: function(aabb) {
+    isBoxVisible: function(aabb, checkZ) {
         var frustum = this.getFrustum();
         
-        // Check if the box is completely outside the frustum
+        // Check if the box is completely outside the frustum in X and Y
         if (aabb.max.x < frustum.left || aabb.min.x > frustum.right) return false;
         if (aabb.max.y < frustum.bottom || aabb.min.y > frustum.top) return false;
-        if (aabb.max.z < frustum.near || aabb.min.z > frustum.far) return false;
+        
+        // Only check Z if explicitly requested (for 3D objects in a 2D world)
+        if (checkZ === true) {
+            if (aabb.max.z < frustum.near || aabb.min.z > frustum.far) return false;
+        }
         
         return true;
     },
@@ -419,22 +423,22 @@ ECS.CameraComponent = ECS.Component.extend({
         var width = contentSize.width * transform.scale.x;
         var height = contentSize.height * transform.scale.y;
         
-        // Create AABB (axis-aligned bounding box) for the entity
+        // Create AABB for the entity (only 2D - xy plane)
         var aabb = {
             min: new glm.vec3(
                 worldPos.x - (width/2) - margin,
                 worldPos.y - (height/2) - margin,
-                0
+                0  // We can just use 0 for 2D
             ),
             max: new glm.vec3(
                 worldPos.x + (width/2) + margin,
                 worldPos.y + (height/2) + margin,
-                0
+                0  // We can just use 0 for 2D
             )
         };
         
-        // Check if the AABB is visible in the frustum
-        return this.isBoxVisible(aabb);
+        // Check if the AABB is visible in the frustum (without Z check)
+        return this.isBoxVisible(aabb, false);
     },
     
     /**
@@ -474,4 +478,31 @@ ECS.CameraComponent = ECS.Component.extend({
         this._needsUpdate = true;
         this.updateMatrices();
     },
+
+    spin: function(degree) {
+        // Convert degrees to radians
+        var radians = cc.degreesToRadians(degree);
+        
+        // Create rotation matrix around Z-axis for 2D
+        var rotMat = new glm.mat4(1.0); // Identity matrix
+        rotMat = glm.rotate(rotMat, radians, new glm.vec3(0, 0, 1));
+        
+        // Get current position
+        var position = this.transform.getWorldPosition();
+        
+        // Rotate the up vector
+        var upVec4 = new glm.vec4(this.up.x, this.up.y, this.up.z, 0);
+        upVec4 = glm.mul(rotMat, upVec4);
+        this.up = glm.normalize(new glm.vec3(upVec4.x, upVec4.y, upVec4.z));
+        let lookAt = glm.add(position, new glm.vec3(0, 0, -1));
+        // Rotate the lookAt direction
+        var lookDirection = glm.sub(lookAt, position);
+        var lookVec4 = new glm.vec4(lookDirection.x, lookDirection.y, lookDirection.z, 0);
+        lookVec4 = glm.mul(rotMat, lookVec4);
+        this.lookAt = glm.add(position, new glm.vec3(lookVec4.x, lookVec4.y, lookVec4.z));
+        
+        // Mark for matrix update
+        this._needsUpdate = true;
+        this.updateMatrices();
+    }
 });

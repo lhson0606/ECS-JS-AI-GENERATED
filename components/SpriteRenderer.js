@@ -13,7 +13,7 @@ ECS.SpriteRenderer = ECS.Component.extend({
         this.blendMode = null; // Use default Cocos blend mode
         this.zOrder = 0;
         this.useCamera = true; // Whether to apply camera transformations
-        this.enableFrustumCulling = false; // Whether to use camera frustum culling
+        this.enableFrustumCulling = true; // Whether to use camera frustum culling
     },
 
     _name: function() {
@@ -73,7 +73,9 @@ ECS.SpriteRenderer = ECS.Component.extend({
             // Check if the entity is visible in the camera frustum
             var isVisible = ECS.gI().camera.isBoxVisible(aabb);
             this.sprite.setVisible(isVisible);
-            
+            // if(!isVisible) {
+            //     Log.debug("SpriteRenderer: Entity is not visible in camera frustum id: " + this.entityId);
+            // }
             // If not visible, we can skip the rest of the update
             if (!isVisible) return;
         }
