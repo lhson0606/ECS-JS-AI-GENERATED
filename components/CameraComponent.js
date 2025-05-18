@@ -193,7 +193,7 @@ ECS.CameraComponent = ECS.Component.extend({
         
         // Invert the camera transformation
         var invMatrix = glm.inverse(this.combined);
-        var worldVec4 = glm.multiply(invMatrix, ndcVec4);
+        var worldVec4 = glm.mul(invMatrix, ndcVec4);
         
         // Convert back to vec3 (dividing by w for completeness)
         return new glm.vec3(
