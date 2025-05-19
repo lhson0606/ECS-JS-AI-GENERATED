@@ -31,8 +31,8 @@ CameraDemo = cc.Layer.extend({
         const sizes = cc.director.getVisibleSize();
         
         // Create test entities
-        this.player = gv.EntityFactory.createCocosSpriteEntity(res.images.ui.LOGO);
-        this.player2 = gv.EntityFactory.createCocosSpriteEntityWithPosition(res.images.ui.LOGO, glm.vec3(50, -150, 0));
+        this.player = gv.EntityFactory.createCocosSpriteEntity(res.images.ui.LOGO, glm.vec3(0, 0, 0));
+        // this.player2 = gv.EntityFactory.createCocosSpriteEntityWithPosition(res.images.ui.LOGO, glm.vec3(300, 300, 0));
         
         // Create instruction text
         this.createInstructionText(sizes);
@@ -178,11 +178,11 @@ CameraDemo = cc.Layer.extend({
         }
         
         // Update player if needed
-        var playerTransform = ECS.gI().ComponentManager.getComponent(this.player, "TransformComponent");
-        if (playerTransform) {
-            // Optional: Add player movement logic here
-            // playerTransform.rotate(0, 0, dt * 20); // Rotate player slowly
-        }
+        // var playerTransform = ECS.gI().ComponentManager.getComponent(this.player, "TransformComponent");
+        // if (playerTransform) {
+        //     // Optional: Add player movement logic here
+        //     // playerTransform.rotate(0, 0, dt * 20); // Rotate player slowly
+        // }
     },
     
     // Helper method to zoom at the mouse position

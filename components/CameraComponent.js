@@ -25,7 +25,7 @@ ECS.CameraComponent = ECS.Component.extend({
         this._followTarget = null;
         this._smoothFollow = false;
         this._smoothSpeed = 5;
-        this.up = new glm.vec3(0, -1, 0); // Y is up
+        this.up = new glm.vec3(0, 1, 0); // Y is up
     },
 
     _name: function() {
@@ -170,7 +170,7 @@ ECS.CameraComponent = ECS.Component.extend({
         // Convert NDC to screen space
         return new glm.vec2(
             ((ndcSpace.x + 1.0) * 0.5) * this.viewportSize.x,
-            ((1.0 - ndcSpace.y) * 0.5) * this.viewportSize.y // Flip Y to match Cocos2d-x
+            ((ndcSpace.y + 1.0) * 0.5) * this.viewportSize.y
         );
     },
     
@@ -186,8 +186,8 @@ ECS.CameraComponent = ECS.Component.extend({
         
         // Convert screen space to NDC
         var ndcX = (screenPos.x / this.viewportSize.x) * 2.0 - 1.0;
-        var ndcY = 1.0 - (screenPos.y / this.viewportSize.y) * 2.0; // Flip Y to match Cocos2d-x
-        
+        var ndcY = (screenPos.y / this.viewportSize.y) * 2.0 - 1.0; // Flip Y to match Cocos2d-x
+
         // Create homogeneous NDC coordinate (assume z=0 for 2D)
         var ndcVec4 = new glm.vec4(ndcX, ndcY, 0.0, 1.0);
         
